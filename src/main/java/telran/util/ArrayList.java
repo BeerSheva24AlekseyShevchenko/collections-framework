@@ -101,13 +101,11 @@ public class ArrayList<T> implements List<T> {
     @Override
     @SuppressWarnings("unchecked")
     public T get(int index) {
-        T res = null;
-
-        if (index >= 0 && index < size) {
-            res = (T) array[index];
+        if (index < 0 || index > size) {
+            throw new ArrayIndexOutOfBoundsException();
         }
 
-        return res;
+        return (T) array[index];
     }
 
     @Override
@@ -115,7 +113,7 @@ public class ArrayList<T> implements List<T> {
         int res = -1;
         int i = 0;
         while (res < 0 && i < size) {
-            if (array[i].equals(pattern)) {
+            if (isEqual(pattern, array[i])) {
                 res = i;
             }
             i++;
@@ -130,12 +128,16 @@ public class ArrayList<T> implements List<T> {
         int i = size;
         while (res < 0 && i > 0) {
             i--;
-            if (array[i].equals(pattern)) {
+            if (isEqual(pattern, array[i])) {
                 res = i;
             }
         }
 
         return res;
+    }
+
+    private boolean isEqual(Object o1, Object o2) {
+        return o1 == null && o2 == null || o1.equals(o2);
     }
 
 }
