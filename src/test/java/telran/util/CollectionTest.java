@@ -27,6 +27,7 @@ public abstract class CollectionTest {
     @Test
     void removeTest() {
         assertTrue(collection.remove(10));
+        assertTrue(collection.remove(20));
         assertEquals(arr.length - 2, collection.size());
     }
 
@@ -48,6 +49,7 @@ public abstract class CollectionTest {
         collection.remove(10);
         collection.remove(20);
         collection.remove(1);
+        collection.remove(10);
         collection.remove(8);
         collection.remove(100);
         collection.remove(17);

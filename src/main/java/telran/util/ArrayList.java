@@ -30,15 +30,12 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public boolean remove(T pattern) {
-        boolean res = false;
         int index = indexOf(pattern);
-        while (index >= 0) {
+        if (index >= 0) {
             remove(index);
-            index = indexOf(pattern);
-            res = true;
         }
 
-        return res;
+        return index >= 0;
     }
 
     @Override
@@ -69,7 +66,7 @@ public class ArrayList<T> implements List<T> {
             @Override
             @SuppressWarnings("unchecked")
             public T next() {
-                if(!hasNext()) {
+                if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
 

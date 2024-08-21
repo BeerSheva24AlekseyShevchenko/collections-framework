@@ -14,14 +14,14 @@ public abstract class ListTest extends CollectionTest {
     }
 
     @Test
-    void getTest() {
+    void listGetTest() {
         assertEquals(3, list.get(0));
         assertEquals(1, list.get(3));
         assertEquals(null, list.get(8));
     }
 
     @Test
-    void addTest() {
+    void listAddTest() {
         list.add(3, 17);
         list.add(9, 200);
         assertEquals(17, list.get(3));
@@ -30,18 +30,18 @@ public abstract class ListTest extends CollectionTest {
     }
 
     @Test
-    void removeTest() {
+    void listRemoveTest() {
         assertEquals(1, list.remove(3));
         assertEquals(arr.length - 1, list.size());
     }
 
     @Test
-    void indexOfTest() {
+    void listIndexOfTest() {
         assertEquals(1, list.indexOf(10));
     }
 
     @Test
-    void lastIndexOfTest() {
+    void listLastIndexOfTest() {
         assertEquals(4, list.lastIndexOf(10));
     }
 }
