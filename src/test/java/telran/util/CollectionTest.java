@@ -5,11 +5,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Random;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
 public abstract class CollectionTest {
+    private static final int N_ELEMENTS = 1_000_000;
+    Random random = new Random();
     protected Collection<Integer> collection;
     Integer[] arr = {3, 10, 20, 1, 10, 8, 100, 17};
 
@@ -96,5 +100,41 @@ public abstract class CollectionTest {
         Object[] result = stream.sorted().toArray();
         Object[] expended = {1, 3, 8, 10, 10, 17, 20, 100};
         assertArrayEquals(expended, result);
+    }
+
+    @Test
+    void removeIfTest() {
+        assertTrue(collection.removeIf(n -> n % 2 == 0));
+        assertFalse(collection.removeIf(n -> n % 2 == 0));
+        assertTrue(collection.stream().allMatch(n -> n % 2 != 0));
+    }
+
+    @Test
+    void clearTest() {
+        collection.clear();
+        assertTrue(collection.isEmpty());
+    }
+
+    @Test
+    void removeInIteratorTest(){
+        Iterator<Integer> it = collection.iterator();
+        assertThrowsExactly(IllegalStateException.class, () -> it.remove());
+        Integer n = it.next();
+        it.remove();
+        it.next();
+        it.next();
+        it.remove();
+        assertFalse(collection.contains(n));
+        assertThrowsExactly(IllegalStateException.class, () -> it.remove());
+    }
+
+    @Test 
+    void performanceTest() {
+        collection.clear();
+        IntStream.range(0, N_ELEMENTS).forEach(i -> collection.add(random.nextInt()));
+        collection.removeIf(n -> n % 2 == 0);
+        assertTrue(collection.stream().allMatch(n -> n % 2 != 0));
+        collection.clear();
+        assertTrue(collection.isEmpty());
     }
 }

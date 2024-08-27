@@ -3,6 +3,7 @@ package telran.util;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 
 public class ArrayList<T> implements List<T> {
     private static final int DEFAULT_CAPACITY = 16;
@@ -26,6 +27,18 @@ public class ArrayList<T> implements List<T> {
 
     private void reallocate() {
         array = Arrays.copyOf(array, array.length * 2);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean removeIf(Predicate<T> predicate) {
+        int j = 0;
+        for (int i = 0; i < size; i++) {
+            if (predicate.negate().test((T) array[i])) {
+                array[j++] = array[i];
+            }
+        }
+        return size != (size = j);
     }
 
     @Override
@@ -57,9 +70,11 @@ public class ArrayList<T> implements List<T> {
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             private int current = 0;
+            private boolean flNext = false;
 
             @Override
             public boolean hasNext() {
+                flNext = true;
                 return current < size;
             }
 
@@ -71,6 +86,15 @@ public class ArrayList<T> implements List<T> {
                 }
 
                 return (T) array[current++];
+            }
+
+            @Override
+            public void remove() {
+                if(!flNext) {
+                    throw new IllegalStateException();
+                }
+                ArrayList.this.remove(--current);
+                flNext = false;
             }
         };
     }
