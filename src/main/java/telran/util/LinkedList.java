@@ -143,7 +143,7 @@ public class LinkedList<T> implements List<T> {
 
             @Override
             public void remove() {
-                if(prev == null) {
+                if (prev == null) {
                     throw new IllegalStateException();
                 }
                 removeNode(prev);

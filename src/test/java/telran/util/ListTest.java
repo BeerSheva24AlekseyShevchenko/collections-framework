@@ -26,9 +26,9 @@ public abstract class ListTest extends CollectionTest {
     @Test
     void listAddTest() {
         list.add(3, 17);
-        list.add(9, 200);
+        list.add(list.size(), 200);
         assertEquals(17, list.get(3));
-        assertEquals(200, list.get(9));
+        assertEquals(200, list.get(list.size() - 1));
         assertEquals(arr.length + 2, list.size());
 
         assertThrows(IndexOutOfBoundsException.class, () -> list.add(-1, 1));
@@ -51,6 +51,15 @@ public abstract class ListTest extends CollectionTest {
 
     @Test
     void listLastIndexOfTest() {
-        assertEquals(4, list.lastIndexOf(10));
+        list.add(10);
+        assertEquals(list.size() - 1, list.lastIndexOf(10));
+    }
+
+    @Test
+    void duplicateValuesTest() {
+        for (Integer item: arr) {
+            list.add(item);
+        }
+        assertEquals(collection.size(), arr.length * 2);
     }
 }

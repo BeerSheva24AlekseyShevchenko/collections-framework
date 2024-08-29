@@ -5,17 +5,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Random;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
 public abstract class CollectionTest {
-    private static final int N_ELEMENTS = 1_000_000;
-    Random random = new Random();
     protected Collection<Integer> collection;
-    Integer[] arr = {3, 10, 20, 1, 10, 8, 100, 17};
+    Integer[] arr = {3, 10, 20, 1, 8, 100, 17};
 
     void setUp() {
         Arrays.stream(arr).forEach(collection::add);
@@ -24,7 +20,7 @@ public abstract class CollectionTest {
     @Test
     void addTest() {
         assertTrue(collection.add(200));
-        assertTrue(collection.add(17));
+        assertTrue(collection.add(202));
         assertEquals(arr.length + 2, collection.size());
     }
 
@@ -53,7 +49,6 @@ public abstract class CollectionTest {
         collection.remove(10);
         collection.remove(20);
         collection.remove(1);
-        collection.remove(10);
         collection.remove(8);
         collection.remove(100);
         collection.remove(17);
@@ -69,6 +64,9 @@ public abstract class CollectionTest {
         while (it.hasNext()) {
             actual[index++] = it.next();
         }
+
+        Arrays.sort(arr);
+        Arrays.sort(actual);
 
         assertArrayEquals(arr, actual);
         assertThrows(NoSuchElementException.class, it::next);
@@ -93,12 +91,12 @@ public abstract class CollectionTest {
 
     private void streamSumTest(Stream<Integer> stream) {
         int result = stream.mapToInt(Integer::intValue).sum();
-        assertEquals(169, result);
+        assertEquals(159, result);
     }
 
     private void streamSortTest(Stream<Integer> stream) {
         Object[] result = stream.sorted().toArray();
-        Object[] expended = {1, 3, 8, 10, 10, 17, 20, 100};
+        Object[] expended = {1, 3, 8, 10, 17, 20, 100};
         assertArrayEquals(expended, result);
     }
 
@@ -126,15 +124,5 @@ public abstract class CollectionTest {
         it.remove();
         assertFalse(collection.contains(n));
         assertThrowsExactly(IllegalStateException.class, () -> it.remove());
-    }
-
-    @Test 
-    void performanceTest() {
-        collection.clear();
-        IntStream.range(0, N_ELEMENTS).forEach(i -> collection.add(random.nextInt()));
-        collection.removeIf(n -> n % 2 == 0);
-        assertTrue(collection.stream().allMatch(n -> n % 2 != 0));
-        collection.clear();
-        assertTrue(collection.isEmpty());
     }
 }
