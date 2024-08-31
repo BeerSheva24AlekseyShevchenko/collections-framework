@@ -18,7 +18,7 @@ public class TreeSet<T> implements Set<T> {
 
     private class TreeSetIterator implements Iterator<T> {
         List<Node<T>> stack = new LinkedList<>();
-        T prevObj = null;
+        Node<T> prevNode = null;
 
         TreeSetIterator() {
             addNodeToStack(root);
@@ -46,18 +46,18 @@ public class TreeSet<T> implements Set<T> {
 
             Node<T> node = stack.remove(stack.size() - 1);
             addNodeToStack(node.right);
-            prevObj = node.obj;
+            prevNode = node;
 
             return node.obj;
         }
 
         @Override
         public void remove() {
-            if (prevObj == null) {
+            if (prevNode == null) {
                 throw new IllegalStateException();
             }
-            TreeSet.this.remove(prevObj);
-            prevObj = null;
+            removeNode(prevNode);
+            prevNode = null;
         }
     }
 
@@ -91,7 +91,7 @@ public class TreeSet<T> implements Set<T> {
 
     private void addRoot(Node<T> node) {
         root = node;
-        if (node != null) node.parent = null;
+        // if (node != null) node.parent = null;
     }
 
     private void addAfterParent(Node<T> node) {
@@ -122,27 +122,44 @@ public class TreeSet<T> implements Set<T> {
 
     private void removeNodeBase(Node<T> node) {
         if (node.left == null && node.right == null) {
-            changeNode(node, null);
+            changeNode(node, null, false);
         } else if (node.left == null) {
-            changeNode(node, node.right);
+            changeNode(node, node.right, false);
         } else if (node.right == null) {
-            changeNode(node, node.left);
+            changeNode(node, node.left, false);
         } else {
             Node<T> minNode = getMinNode(node.right);
-            node.obj = minNode.obj;
             removeNodeBase(minNode);
+            changeNode(node, minNode, true);
         }
     }
 
-    private void changeNode(Node<T> prev, Node<T> next) {
-        if (prev == root) addRoot(next);
-        else changeNodeLeaf(prev, next);
+    private void changeNode(Node<T> prev, Node<T> next, boolean isLeafSync) {
+        changeNodeSyncParent(prev, next);
+        changeNodeSyncRoot(prev, next);
+        if (isLeafSync) changeNodeSyncLeaf(prev, next);
     }
 
-    private void changeNodeLeaf(Node<T> prev, Node<T> next) {
-        if (prev.parent.left == prev) prev.parent.left = next;
-        if (prev.parent.right == prev) prev.parent.right = next;
-        if (next != null) next.parent = prev.parent;
+    private void changeNodeSyncParent(Node<T> prev, Node<T> next) {
+        if (next != null) {
+            next.parent = prev.parent;
+        }
+
+        if (prev.parent != null) {
+            if (prev.parent.left == prev) prev.parent.left = next;
+            if (prev.parent.right == prev) prev.parent.right = next;
+        }
+    }
+
+    private void changeNodeSyncRoot(Node<T> prev, Node<T> next) {
+        if (prev == root) addRoot(next);
+    }
+
+    private void changeNodeSyncLeaf(Node<T> prev, Node<T> next) {
+        next.right = prev.right;
+        if (prev.right != null) prev.right.parent = next;
+        next.left = prev.left;
+        if (prev.left != null) prev.left.parent = next;
     }
 
     private Node<T> getMinNode(Node<T> node) {
