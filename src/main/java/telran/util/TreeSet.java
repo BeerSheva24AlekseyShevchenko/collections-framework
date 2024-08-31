@@ -17,25 +17,30 @@ public class TreeSet<T> implements Set<T> {
     }
 
     private class TreeSetIterator implements Iterator<T> {
-        List<Node<T>> stack = new LinkedList<>();
+        Node<T> current = null;
         Node<T> prevNode = null;
 
         TreeSetIterator() {
-            addNodeToStack(root);
+            current = getMinNode(root);
         }
 
-        private Node<T> addNodeToStack(Node<T> node) {
-            while (node != null) {
-                stack.add(node);
-                node = node.left;
-            }
+        private void setNextCurrent() {
+            current = current.right == null ?
+                getFirstHigherParent(current) :
+                getMinNode(current.right);
+        }
 
-            return node;
+        private Node<T> getFirstHigherParent(Node<T> node) {
+            Node<T> res = node;
+            while (res.parent != null && res.parent.right == res) {
+                res = res.parent;
+            }
+            return res.parent;
         }
 
         @Override
         public boolean hasNext() {
-            return !stack.isEmpty();
+            return current != null;
         }
 
         @Override
@@ -44,11 +49,11 @@ public class TreeSet<T> implements Set<T> {
                 throw new NoSuchElementException();
             }
 
-            Node<T> node = stack.remove(stack.size() - 1);
-            addNodeToStack(node.right);
-            prevNode = node;
+            prevNode = current;
+            T res = current.obj;
+            setNextCurrent();
 
-            return node.obj;
+            return res;
         }
 
         @Override
