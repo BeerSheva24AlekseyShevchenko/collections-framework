@@ -120,55 +120,42 @@ public class TreeSet<T> implements Set<T> {
     }
 
     private void removeNode(Node<T> node) {
-        removeNodeBase(node);
         size--;
-    }
-
-    private void removeNodeBase(Node<T> node) {
-        if (node.left == null && node.right == null) {
-            changeNode(node, null, false);
-        } else if (node.left == null) {
-            changeNode(node, node.right, false);
-        } else if (node.right == null) {
-            changeNode(node, node.left, false);
+        if (node.left == null || node.right == null) {
+            removeNodeWithoutJunction(node);
         } else {
-            Node<T> minNode = getMinNode(node.right);
-            removeNodeBase(minNode);
-            changeNode(node, minNode, true);
+            removeNodeWithJunction(node);
         }
     }
 
-    private void changeNode(Node<T> prev, Node<T> next, boolean isLeafSync) {
-        changeNodeSyncParent(prev, next);
-        changeNodeSyncRoot(prev, next);
-        if (isLeafSync) changeNodeSyncLeaf(prev, next);
-    }
+    private void removeNodeWithoutJunction(Node<T> node) {
+        Node<T> child = node.left == null ? node.right : node.left;
+        if (child != null) child.parent = node.parent;
 
-    private void changeNodeSyncParent(Node<T> prev, Node<T> next) {
-        if (next != null) {
-            next.parent = prev.parent;
-        }
-
-        if (prev.parent != null) {
-            if (prev.parent.left == prev) prev.parent.left = next;
-            if (prev.parent.right == prev) prev.parent.right = next;
+        if (node == root) {
+            addRoot(child);
+        } else {
+            if (node.parent.left == node) node.parent.left = child;
+            if (node.parent.right == node) node.parent.right = child;
         }
     }
 
-    private void changeNodeSyncRoot(Node<T> prev, Node<T> next) {
-        if (prev == root) addRoot(next);
-    }
-
-    private void changeNodeSyncLeaf(Node<T> prev, Node<T> next) {
-        next.right = prev.right;
-        if (prev.right != null) prev.right.parent = next;
-        next.left = prev.left;
-        if (prev.left != null) prev.left.parent = next;
+    private void removeNodeWithJunction(Node<T> node) {
+        Node<T> nextNode = getMaxNode(node.left);
+        node.obj = nextNode.obj;
+        removeNodeWithoutJunction(nextNode);
     }
 
     private Node<T> getMinNode(Node<T> node) {
         while (node.left != null) {
             node = node.left;
+        }
+        return node;
+    }
+
+    private Node<T> getMaxNode(Node<T> node) {
+        while (node.right != null) {
+            node = node.right;
         }
         return node;
     }
