@@ -96,7 +96,6 @@ public class TreeSet<T> implements Set<T> {
 
     private void addRoot(Node<T> node) {
         root = node;
-        // if (node != null) node.parent = null;
     }
 
     private void addAfterParent(Node<T> node) {

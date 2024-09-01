@@ -5,12 +5,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Random;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
 public abstract class CollectionTest {
+    private static final int N_ELEMENTS = 2_000_000;
     protected Collection<Integer> collection;
+    Random random = new Random();
     Integer[] arr = {3, 10, 20, 1, 8, 100, 17};
 
     void setUp() {
@@ -124,5 +128,15 @@ public abstract class CollectionTest {
         it.remove();
         assertFalse(collection.contains(n));
         assertThrowsExactly(IllegalStateException.class, () -> it.remove());
+    }
+
+    @Test 
+    void performanceTest() {
+        collection.clear();
+        IntStream.range(0, N_ELEMENTS).forEach(i -> collection.add(random.nextInt()));
+        collection.removeIf(n -> n % 2 == 0);
+        assertTrue(collection.stream().allMatch(n -> n % 2 != 0));
+        collection.clear();
+        assertTrue(collection.isEmpty());
     }
 }
