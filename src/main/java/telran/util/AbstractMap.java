@@ -6,7 +6,6 @@ import java.util.Objects;
 @SuppressWarnings("unchecked")
 public abstract class AbstractMap<K, V> implements Map<K, V> {
     protected Set<Entry<K, V>> entrySet;
-    private int size = 0;
 
     protected abstract Set<K> getEmptyKeySet();
 
@@ -26,7 +25,6 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
     
         if (entry == null) {
             entrySet.add(new Entry<>(key, value));
-            size++;
         } else {
             res = entry.getValue();
             entry.setValue(value);
@@ -42,13 +40,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean containsValue(Object value) {
-        Iterator<Entry<K, V>> iterator = entrySet.iterator();
-        boolean res = false;
-        while (iterator.hasNext() && !res) {
-            Entry<K, V> entry = iterator.next();
-            res = Objects.equals(value, entry.getValue());
-        }
-        return res;
+        return entrySet.stream().anyMatch(i -> Objects.equals(value, i.getValue()));
     }
 
     @Override
@@ -72,11 +64,11 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 
     @Override
     public int size() {
-        return size;
+        return entrySet.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return size == 0;
+        return entrySet.isEmpty();
     }
 }
