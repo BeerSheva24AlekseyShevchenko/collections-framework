@@ -24,11 +24,8 @@ public class LinkedHashSet<T> implements Set<T> {
         
         @Override
         public void remove() {
-            if (prev == null) {
-                throw new IllegalStateException();
-            }
-            Node<T> node = map.remove(prev);
-            list.removeNode(node);
+            iterator.remove();
+            map.remove(prev);
             prev = null;
         }
     }
