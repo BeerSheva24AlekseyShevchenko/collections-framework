@@ -15,7 +15,9 @@ public abstract class CollectionTest {
     private static final int N_ELEMENTS = 2_000_000;
     protected Collection<Integer> collection;
     Random random = new Random();
-    Integer[] arr = {3, 10, 20, 1, 8, 100, 17};
+    Integer[] arr = {3, -10, 20, 1, 10, 8, 100, 17};
+
+    abstract <T> void runTest(T[] expected, T[] actual);
 
     void setUp() {
         Arrays.stream(arr).forEach(collection::add);
@@ -49,13 +51,7 @@ public abstract class CollectionTest {
     @Test
     void isEmptyTest() {
         assertFalse(collection.isEmpty());
-        collection.remove(3);
-        collection.remove(10);
-        collection.remove(20);
-        collection.remove(1);
-        collection.remove(8);
-        collection.remove(100);
-        collection.remove(17);
+        for (Integer value: arr) collection.remove(value);
         assertTrue(collection.isEmpty());
     }
 
@@ -78,6 +74,8 @@ public abstract class CollectionTest {
 
     @Test
     void streamTest() {
+        runTest(arr, collection.stream().toArray(Integer[]::new));
+
         streamUniqTest(collection.stream());
         streamUniqTest(collection.parallelStream());
 
@@ -90,17 +88,21 @@ public abstract class CollectionTest {
 
     private void streamUniqTest(Stream<Integer> stream) {
         Object[] result = stream.distinct().toArray();
-        assertEquals(7, result.length);
+        assertEquals(arr.length, result.length);
     }
 
     private void streamSumTest(Stream<Integer> stream) {
         int result = stream.mapToInt(Integer::intValue).sum();
-        assertEquals(159, result);
+        int sum = 0;
+        for (Integer value: arr) sum +=value;
+    
+        assertEquals(sum, result);
     }
 
     private void streamSortTest(Stream<Integer> stream) {
         Object[] result = stream.sorted().toArray();
-        Object[] expended = {1, 3, 8, 10, 17, 20, 100};
+        Integer[] expended = arr.clone();
+        Arrays.sort(expended);
         assertArrayEquals(expended, result);
     }
 

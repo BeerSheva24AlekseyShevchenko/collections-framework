@@ -40,24 +40,16 @@ public interface Map<K, V> {
             return key.equals(entry.key);
         }
     }
-
     V get(Object key);
-
     V put(K key, V value);
-
     boolean containsKey(Object key);
-
     boolean containsValue(Object key);
-
     Set<K> keySet();
-
     Set<Entry<K,V>> entrySet();
-
     Collection<V> values();
-
     int size();
-
     boolean isEmpty();
+    V remove(K key);
 
     default V getOrDefault(Object key, V defaultValue) {
         V res = get(key);

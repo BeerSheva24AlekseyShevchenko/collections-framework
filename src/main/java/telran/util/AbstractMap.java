@@ -1,6 +1,5 @@
 package telran.util;
 
-import java.util.Iterator;
 import java.util.Objects;
 
 @SuppressWarnings("unchecked")
@@ -11,16 +10,14 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 
     @Override
     public V get(Object key) {
-        Entry<K, V> pattern = new Entry<>((K)key, null);
-        Entry<K,V> entry = entrySet.get(pattern);
+        Entry<K, V> entry = getEntry(key);
 
         return entry == null ? null : entry.getValue();
     }
 
     @Override
     public V put(K key, V value) {
-        Entry<K, V> pattern = new Entry<>((K)key, null);
-        Entry<K, V> entry = entrySet.get(pattern);
+        Entry<K, V> entry = getEntry(key);
         V res = null;
     
         if (entry == null) {
@@ -35,7 +32,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean containsKey(Object key) {
-        return entrySet.contains(new Entry<K, V>((K) key, null));
+        return entrySet.contains(getPattern(key));
     }
 
     @Override
@@ -70,5 +67,26 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
     @Override
     public boolean isEmpty() {
         return entrySet.isEmpty();
+    }
+
+    @Override
+    public V remove(K key) {
+        Entry<K, V> entry = getEntry(key);
+        V res = null;
+        if (entry != null) {
+            entrySet.remove(entry);
+            res = entry.getValue();
+        }
+        return res;
+    }
+
+    private Entry<K, V> getEntry(Object key) {
+        Entry<K, V> pattern = getPattern(key);
+        Entry<K,V> entry = entrySet.get(pattern);
+        return entry;
+    }
+
+    private Entry<K, V> getPattern(Object key) {
+        return new Entry<>((K)key, null);
     }
 }

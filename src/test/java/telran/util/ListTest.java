@@ -1,5 +1,6 @@
 package telran.util;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -12,6 +13,12 @@ public abstract class ListTest extends CollectionTest {
     void setUp() {
         super.setUp();
         list = (List<Integer>) super.collection;
+    }
+
+    @Override
+    <T> void runTest(T[] expected, T[] actual) {
+        assertArrayEquals(expected, actual);
+        assertEquals(expected.length, collection.size());
     }
 
     @Test
@@ -46,7 +53,7 @@ public abstract class ListTest extends CollectionTest {
 
     @Test
     void listIndexOfTest() {
-        assertEquals(1, list.indexOf(10));
+        assertEquals(4, list.indexOf(10));
     }
 
     @Test

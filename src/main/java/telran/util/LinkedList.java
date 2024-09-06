@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class LinkedList<T> implements List<T> {
-    private static class Node<T> {
+    static class Node<T> {
         T obj;
         Node<T> next;
         Node<T> prev;
@@ -15,11 +15,42 @@ public class LinkedList<T> implements List<T> {
         }
     }
 
-    Node<T> head;
-    Node<T> tail;
-    int size = 0;
+    class LinkedListIterator implements Iterator<T> {
+        Node<T> current = head;
+        Node<T> prev = null;
 
-    public Node<T> getNode(int index) {
+        @Override
+        public boolean hasNext() {
+            return current != null;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            T obj = current.obj;
+            prev = current;
+            current = current.next;
+            return obj;
+        }
+
+        @Override
+        public void remove() {
+            if (prev == null) {
+                throw new IllegalStateException();
+            }
+            removeNode(prev);
+            prev = null;
+        }
+    }
+
+    private Node<T> head;
+    private Node<T> tail;
+    private int size = 0;
+
+    Node<T> getNode(int index) {
         return index < size / 2 ? getNodeFromHead(index) : getNodeFromTail(index);
     }
 
@@ -41,7 +72,7 @@ public class LinkedList<T> implements List<T> {
         return current;
     }
 
-    public void addNode(Node<T> node, int index) {
+    void addNode(Node<T> node, int index) {
         if (index == 0) {
             addHead(node);
         } else if (index == size) {
@@ -120,36 +151,7 @@ public class LinkedList<T> implements List<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            private Node<T> current = head;
-            private Node<T> prev = null;
-
-            @Override
-            public boolean hasNext() {
-                return current != null;
-            }
-
-            @Override
-            public T next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
-
-                T obj = current.obj;
-                prev = current;
-                current = current.next;
-                return obj;
-            }
-
-            @Override
-            public void remove() {
-                if (prev == null) {
-                    throw new IllegalStateException();
-                }
-                removeNode(prev);
-                prev = null;
-            }
-        };
+        return new LinkedListIterator();
     }
 
     @Override
@@ -168,7 +170,7 @@ public class LinkedList<T> implements List<T> {
     }
 
 
-    private void removeNode(Node<T> node) {
+    void removeNode(Node<T> node) {
         if (node == head) {
             removeHead();
         } else if (node == tail) {

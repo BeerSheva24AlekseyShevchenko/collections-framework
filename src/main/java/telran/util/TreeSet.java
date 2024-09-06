@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 @SuppressWarnings("unchecked")
-public class TreeSet<T> implements Set<T> {
+public class TreeSet<T> implements SortedSet<T> {
     private static class Node<T> {
         T obj;
         Node<T> parent;
@@ -26,17 +26,10 @@ public class TreeSet<T> implements Set<T> {
 
         private void setNextCurrent() {
             current = current.right == null ?
-                getFirstHigherParent(current) :
+                getGreaterParent(current) :
                 getMinNode(current.right);
         }
 
-        private Node<T> getFirstHigherParent(Node<T> node) {
-            Node<T> res = node;
-            while (res.parent != null && res.parent.right == res) {
-                res = res.parent;
-            }
-            return res.parent;
-        }
 
         @Override
         public boolean hasNext() {
@@ -208,5 +201,62 @@ public class TreeSet<T> implements Set<T> {
         Node<T> res = getParentOrNode(pattern);
 
         return (res != null && comparator.compare(pattern, res.obj) != 0) ? res : null;
+    }
+
+    private Node<T> getGreaterParent(Node<T> node) {
+        Node<T> res = node;
+        while (res.parent != null && res.parent.right == res) {
+            res = res.parent;
+        }
+        return res.parent;
+    }
+
+    private Node<T> getLowerParent(Node<T> node) {
+        Node<T> res = node;
+        while (res.parent != null && res.parent.left == res) {
+            res = res.parent;
+        }
+        return res.parent;
+    }
+
+    @Override
+    public T first() {
+        return getMinNode(root).obj;
+    }
+
+    @Override
+    public T last() {
+        return getMaxNode(root).obj;
+    }
+
+    @Override
+    public T floor(T key) {
+        Node<T> node = getParentOrNode(key);
+        if (node != null && comparator.compare(key, node.obj) < 0) {
+            node = getLowerParent(node);
+        }
+        return node == null ? null : node.obj;
+    }
+
+    @Override
+    public T ceiling(T key) {
+        Node<T> node = getParentOrNode(key);
+        if (node != null && comparator.compare(key, node.obj) > 0) {
+            node = getGreaterParent(node);
+        }
+        return node == null ? null : node.obj;
+    }
+
+    @Override
+    public SortedSet<T> subSet(T keyFrom, T keyTo) {
+        SortedSet<T> subSet = new TreeSet<>(comparator);
+        this.forEach(i -> {
+            int cmpFrom = comparator.compare(i, keyFrom);
+            int cmpTo = comparator.compare(i, keyTo);
+
+            if (cmpFrom >= 0 && cmpTo < 0) subSet.add(i);
+
+        });
+        return subSet;
     }
 }
