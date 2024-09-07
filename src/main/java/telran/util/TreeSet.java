@@ -140,14 +140,14 @@ public class TreeSet<T> implements SortedSet<T> {
     }
 
     private Node<T> getMinNode(Node<T> node) {
-        while (node.left != null) {
+        while (node != null && node.left != null) {
             node = node.left;
         }
         return node;
     }
 
     private Node<T> getMaxNode(Node<T> node) {
-        while (node.right != null) {
+        while (node != null && node.right != null) {
             node = node.right;
         }
         return node;
@@ -231,32 +231,46 @@ public class TreeSet<T> implements SortedSet<T> {
 
     @Override
     public T floor(T key) {
+        Node<T> node = floorNode(key);
+        return node == null ? null : node.obj;
+    }
+
+    private Node<T> floorNode(T key) {
         Node<T> node = getParentOrNode(key);
         if (node != null && comparator.compare(key, node.obj) < 0) {
             node = getLowerParent(node);
         }
-        return node == null ? null : node.obj;
+        return node;
     }
 
     @Override
     public T ceiling(T key) {
+        Node<T> node = ceilingNode(key);
+        return node == null ? null : node.obj;
+    }
+
+    private Node<T> ceilingNode(T key) {
         Node<T> node = getParentOrNode(key);
         if (node != null && comparator.compare(key, node.obj) > 0) {
             node = getGreaterParent(node);
         }
-        return node == null ? null : node.obj;
+        return node;
     }
 
     @Override
     public SortedSet<T> subSet(T keyFrom, T keyTo) {
+        if (comparator.compare(keyFrom, keyTo) > 0) {
+            throw new IllegalArgumentException();
+        }
+
         SortedSet<T> subSet = new TreeSet<>(comparator);
-        this.forEach(i -> {
-            int cmpFrom = comparator.compare(i, keyFrom);
-            int cmpTo = comparator.compare(i, keyTo);
-
-            if (cmpFrom >= 0 && cmpTo < 0) subSet.add(i);
-
-        });
+        Node<T> node = ceilingNode(keyFrom);;
+        while (node != null && comparator.compare(node.obj, keyTo) < 0) {
+            subSet.add(node.obj);
+            node = node.right == null ?
+                getGreaterParent(node) :
+                getMinNode(node.right);
+        }
         return subSet;
     }
 }

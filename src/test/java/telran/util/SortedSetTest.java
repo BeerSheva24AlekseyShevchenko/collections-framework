@@ -47,5 +47,21 @@ public abstract class SortedSetTest extends SetTest {
         Integer[] expected = {10, 17};
         Integer[] actual = sortedSet.subSet(10, 20).stream().toArray(Integer[]::new);
         assertArrayEquals(expected, actual);
+
+        Integer[] expected2 = {100};
+        Integer[] actual2 = sortedSet.subSet(100, 200).stream().toArray(Integer[]::new);
+        assertArrayEquals(expected2, actual2);
+
+        Integer[] expected3 = {-10};
+        Integer[] actual3 = sortedSet.subSet(-20, -5).stream().toArray(Integer[]::new);
+        assertArrayEquals(expected3, actual3);
+
+        Integer[] actual4 = sortedSet.subSet(-2000, -1000).stream().toArray(Integer[]::new);
+        assertEquals(0, actual4.length);
+
+        Integer[] actual5 = sortedSet.subSet(1000, 2000).stream().toArray(Integer[]::new);
+        assertEquals(0, actual5.length);
+
+        assertThrows(IllegalArgumentException.class, () -> sortedSet.subSet(20, 10));
     }
 }
