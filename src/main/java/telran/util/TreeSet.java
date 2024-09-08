@@ -25,11 +25,8 @@ public class TreeSet<T> implements SortedSet<T> {
         }
 
         private void setNextCurrent() {
-            current = current.right == null ?
-                getGreaterParent(current) :
-                getMinNode(current.right);
+            current = getNextCurrent(current);
         }
-
 
         @Override
         public boolean hasNext() {
@@ -267,10 +264,14 @@ public class TreeSet<T> implements SortedSet<T> {
         Node<T> node = ceilingNode(keyFrom);;
         while (node != null && comparator.compare(node.obj, keyTo) < 0) {
             subSet.add(node.obj);
-            node = node.right == null ?
-                getGreaterParent(node) :
-                getMinNode(node.right);
+            node = getNextCurrent(node);
         }
         return subSet;
+    }
+
+    private Node<T> getNextCurrent(Node<T> current) {
+        return current.right == null ?
+            getGreaterParent(current) :
+            getMinNode(current.right);
     }
 }
