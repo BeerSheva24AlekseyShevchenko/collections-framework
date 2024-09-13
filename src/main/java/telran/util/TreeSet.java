@@ -11,7 +11,8 @@ public class TreeSet<T> implements SortedSet<T> {
         Node<T> parent;
         Node<T> left;
         Node<T> right;
-        Node (T obj) {
+
+        Node(T obj) {
             this.obj = obj;
         }
     }
@@ -59,6 +60,8 @@ public class TreeSet<T> implements SortedSet<T> {
     private Node<T> root;
     private Comparator<T> comparator;
     private int size;
+    private String printingSymbol = " ";
+    private int symbolPerLvl = 2;
 
     public TreeSet() {
         this((Comparator<T>) Comparator.naturalOrder());
@@ -66,6 +69,14 @@ public class TreeSet<T> implements SortedSet<T> {
 
     public TreeSet(Comparator<T> comparator) {
         this.comparator = comparator;
+    }
+
+    public void setPrintingSymbol(String printingSymbol) {
+        this.printingSymbol = printingSymbol;
+    }
+
+    public void setSymbolPerLvl(int symbolPerLvl) {
+        this.symbolPerLvl = symbolPerLvl;
     }
 
     @Override
@@ -120,13 +131,16 @@ public class TreeSet<T> implements SortedSet<T> {
 
     private void removeNodeWithoutJunction(Node<T> node) {
         Node<T> child = node.left == null ? node.right : node.left;
-        if (child != null) child.parent = node.parent;
+        if (child != null)
+            child.parent = node.parent;
 
         if (node == root) {
             addRoot(child);
         } else {
-            if (node.parent.left == node) node.parent.left = child;
-            if (node.parent.right == node) node.parent.right = child;
+            if (node.parent.left == node)
+                node.parent.left = child;
+            if (node.parent.right == node)
+                node.parent.right = child;
         }
     }
 
@@ -257,11 +271,13 @@ public class TreeSet<T> implements SortedSet<T> {
     @Override
     public SortedSet<T> subSet(T keyFrom, T keyTo) {
         if (comparator.compare(keyFrom, keyTo) > 0) {
+
             throw new IllegalArgumentException();
         }
 
         SortedSet<T> subSet = new TreeSet<>(comparator);
-        Node<T> node = ceilingNode(keyFrom);;
+        Node<T> node = ceilingNode(keyFrom);
+        ;
         while (node != null && comparator.compare(node.obj, keyTo) < 0) {
             subSet.add(node.obj);
             node = getNextCurrent(node);
@@ -270,8 +286,75 @@ public class TreeSet<T> implements SortedSet<T> {
     }
 
     private Node<T> getNextCurrent(Node<T> current) {
-        return current.right == null ?
-            getGreaterParent(current) :
-            getMinNode(current.right);
+        return current.right == null ? getGreaterParent(current) : getMinNode(current.right);
+    }
+
+    public void displayTreeRotation() {
+        displayTreeRotation(root, 0);
+    }
+
+    private void displayTreeRotation(Node<T> root, int lvl) {
+        if (root != null) {
+            displayTreeRotation(root.right, lvl + 1);
+            displayRootObject(root.obj, lvl);
+            displayTreeRotation(root.left, lvl + 1);
+        }
+    }
+
+    public void displayTreeParentChildren() {
+        displayTreeParentChildren(root, 0);
+    }
+
+    private void displayTreeParentChildren(Node<T> root, int lvl) {
+        if (root != null) {
+            displayRootObject(root.obj, lvl);
+            displayTreeParentChildren(root.left, lvl + 1);
+            displayTreeParentChildren(root.right, lvl + 1);
+        }
+    }
+
+    private void displayRootObject(T obj, int lvl) {
+        System.out.printf("%s%s\n", printingSymbol.repeat(lvl * symbolPerLvl), obj);
+    }
+
+    public int with() {
+        return with(root);
+    }
+
+    private int with(Node<T> root) {
+        int res = 0;
+        if (root != null) {
+            res = root.left == null && root.right == null ? 1 : with(root.left) + with(root.right);
+        }
+        return res;
+    }
+
+    public int height() {
+        return height(root);
+    }
+
+    private int height(Node<T> root) {
+        int res = 0;
+        if (root != null) {
+            int heightLeft = height(root.left);
+            int heightRight = height(root.right);
+            res = 1 + Math.max(heightLeft, heightRight);
+       }
+        return res;
+    }
+
+    public void inversion() {
+        inversion(root);
+        comparator = comparator.reversed();
+    }
+
+    private void inversion(Node<T> root) {
+        if (root != null) {
+            Node<T> tmp = root.left;
+            root.left = root.right;
+            root.right = tmp;
+            inversion(root.left);
+            inversion(root.right);
+        }
     }
 }
