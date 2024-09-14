@@ -271,13 +271,11 @@ public class TreeSet<T> implements SortedSet<T> {
     @Override
     public SortedSet<T> subSet(T keyFrom, T keyTo) {
         if (comparator.compare(keyFrom, keyTo) > 0) {
-
             throw new IllegalArgumentException();
         }
 
         SortedSet<T> subSet = new TreeSet<>(comparator);
         Node<T> node = ceilingNode(keyFrom);
-        ;
         while (node != null && comparator.compare(node.obj, keyTo) < 0) {
             subSet.add(node.obj);
             node = getNextCurrent(node);
