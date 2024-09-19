@@ -315,29 +315,29 @@ public class TreeSet<T> implements SortedSet<T> {
         System.out.printf("%s%s\n", printingSymbol.repeat(lvl * symbolPerLvl), obj);
     }
 
-    public int with() {
-        return with(root);
+    public int width() {
+        return width(root);
     }
 
-    private int with(Node<T> root) {
+    private int width(Node<T> root) {
         int res = 0;
         if (root != null) {
-            res = root.left == null && root.right == null ? 1 : with(root.left) + with(root.right);
+            res = root.left == null && root.right == null ? 1 : width(root.left) + width(root.right);
         }
         return res;
     }
 
     public int height() {
         return height(root);
-    }
-
+     }
+ 
     private int height(Node<T> root) {
         int res = 0;
         if (root != null) {
             int heightLeft = height(root.left);
             int heightRight = height(root.right);
             res = 1 + Math.max(heightLeft, heightRight);
-       }
+        }
         return res;
     }
 
@@ -354,5 +354,32 @@ public class TreeSet<T> implements SortedSet<T> {
             inversion(root.left);
             inversion(root.right);
         }
+    }
+
+    public void balance() {
+        Node<T> [] nodes = getSortedNodesArray();
+        root = balanceArray(nodes, 0, nodes.length - 1, null);
+    }
+
+    private Node<T> balanceArray(Node<T>[] array, int left, int right, Node<T> parent) {
+        Node<T> root = null;
+       if(left <= right) {
+            int middle = (left + right) / 2;
+            root = array[middle];
+            root.parent = parent;
+            root.left = balanceArray(array, left, middle - 1, root);
+            root.right = balanceArray(array, middle + 1, right, root);
+       }
+       return root;
+    }
+
+    private Node<T>[] getSortedNodesArray() {
+       Node<T>[] array = new Node[size];
+        Node<T> current = getMinNode(root);
+        for(int i = 0; i < size; i++) {
+            array[i] = current;
+            current = getNextCurrent(current);
+        }
+        return array;
     }
 }
